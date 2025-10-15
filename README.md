@@ -21,7 +21,7 @@ A simple and elegant web application built with **Go Fiber v2**, **Handlebars**,
 
 | Category | Technology |
 |----------|------------|
-| **Backend** | Go with Fiber v3 framework |
+| **Backend** | Go with Fiber v2 framework |
 | **Templating** | Handlebars |
 | **Database** | SQLite with GORM ORM |
 | **Frontend CSS** | Bulma CSS Framework |
