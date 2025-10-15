@@ -1,0 +1,66 @@
+<div class="box status-box">
+    <div class="content">
+        <div class="mb-5">
+            <h2 class="title is-3">
+                <span class="running-indicator {{#if IsRunning}}active{{else}}inactive{{/if}}"></span>
+                Round Status: {{#if IsRunning}}In Progress{{else}}Not Started{{/if}}
+            </h2>
+        </div>
+
+        <div class="columns">
+            <div class="column">
+                <div class="notification is-info is-light">
+                    <p class="heading">{{#if IsRunning}}Current Round Started{{else}}Last Round Started{{/if}}</p>
+                    <p class="title is-5">{{LastStartStr}}</p>
+                </div>
+            </div>
+            <div class="column">
+                <div class="notification is-warning is-light">
+                    <p class="heading">{{#if IsRunning}}Current Round Status{{else}}Last Round Ended{{/if}}</p>
+                    <p class="title is-5">{{LastStopStr}}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons is-centered mt-5">
+            <button class="button is-success is-large" 
+                    hx-post="/start" 
+                    hx-target="#status-container"
+                    hx-swap="innerHTML"
+                    {{#if IsRunning}}disabled{{/if}}
+                    title="{{#if IsRunning}}A round is already in progress{{else}}Start a new round{{/if}}">
+                <span class="icon">
+                    <i>▶</i>
+                </span>
+                <span>Start Round</span>
+            </button>
+            <button class="button is-danger is-large" 
+                    hx-post="/stop" 
+                    hx-target="#status-container"
+                    hx-swap="innerHTML"
+                    {{#unless IsRunning}}disabled{{/unless}}
+                    title="{{#if IsRunning}}End the current round{{else}}No round in progress{{/if}}">
+                <span class="icon">
+                    <i>■</i>
+                </span>
+                <span>End Round</span>
+            </button>
+        </div>
+
+        <div class="buttons is-centered mt-4">
+            <a href="/stats" class="button is-info is-light">
+                <span class="icon">
+                    <i>📊</i>
+                </span>
+                <span>View Statistics</span>
+            </a>
+            <a href="/export/csv" class="button is-link is-light">
+                <span class="icon">
+                    <i>📥</i>
+                </span>
+                <span>Export Rounds to CSV</span>
+            </a>
+        </div>
+    </div>
+</div>
+

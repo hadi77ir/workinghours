@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hours Tracker</title>
+    <link rel="stylesheet" href="/static/bulma.min.css">
+    <script src="/static/htmx.min.js"></script>
+    <style>
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .status-box {
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .running-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .running-indicator.active {
+            background-color: #48c774;
+            animation: pulse 2s infinite;
+        }
+        .running-indicator.inactive {
+            background-color: #f14668;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero is-primary is-medium">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <h1 class="title is-1">
+                    Hours Tracker
+                </h1>
+                <p class="subtitle is-4">
+                    Track your work rounds
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-8">
+                    <div id="status-container" 
+                         hx-get="/status" 
+                         hx-trigger="every 30s"
+                         hx-swap="innerHTML">
+                        {{> status}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <p>
+                <strong>Hours Tracker</strong> - Built with Fiber, GORM, Bulma & HTMX
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
+

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Statistics - Hours Tracker</title>
+    <link rel="stylesheet" href="/static/bulma.min.css">
+    <style>
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .stats-table {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .table-container {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .total-time {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <section class="hero is-primary is-medium">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <h1 class="title is-1">
+                    📊 Daily Statistics
+                </h1>
+                <p class="subtitle is-4">
+                    View your work hours by day
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-10">
+                    <div class="box stats-table">
+                        <div class="level mb-4">
+                            <div class="level-left">
+                                <div class="level-item">
+                                    <h2 class="title is-4">Work Hours Summary</h2>
+                                </div>
+                            </div>
+                            <div class="level-right">
+                                <div class="level-item">
+                                    <a href="/" class="button is-link is-light">
+                                        <span class="icon">
+                                            <span>🏠</span>
+                                        </span>
+                                        <span>Back to Tracker</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{#if Summaries}}
+                        <div class="table-container">
+                            <table class="table is-fullwidth is-striped is-hoverable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th class="has-text-centered">Rounds</th>
+                                        <th class="has-text-right">Total Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each Summaries}}
+                                    <tr>
+                                        <td>
+                                            <strong>{{this.DateDisplay}}</strong>
+                                            <br>
+                                            <small class="has-text-grey">{{this.Date}}</small>
+                                        </td>
+                                        <td class="has-text-centered">
+                                            <span class="tag is-info is-light">{{this.RoundCount}} round{{#unless (eq this.RoundCount 1)}}s{{/unless}}</span>
+                                        </td>
+                                        <td class="has-text-right">
+                                            <span class="total-time">{{this.TotalFormatted}}</span>
+                                        </td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+                        {{else}}
+                        <div class="notification is-info is-light">
+                            <p class="has-text-centered">
+                                <span class="icon is-large">
+                                    <span style="font-size: 3rem;">📭</span>
+                                </span>
+                            </p>
+                            <p class="has-text-centered title is-5">No completed rounds yet</p>
+                            <p class="has-text-centered">Start tracking your work to see statistics here!</p>
+                        </div>
+                        {{/if}}
+
+                        <div class="has-text-centered mt-5">
+                            <a href="/export/csv" class="button is-success is-light">
+                                <span class="icon">
+                                    <span>📥</span>
+                                </span>
+                                <span>Export to CSV</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <p>
+                <strong>Hours Tracker</strong> - Built with Fiber, GORM, Bulma & HTMX
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
+
