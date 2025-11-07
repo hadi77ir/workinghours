@@ -1,66 +1,134 @@
 <div class="box status-box">
     <div class="content">
-        <div class="mb-5">
-            <h2 class="title is-3">
-                <span class="running-indicator {{#if IsRunning}}active{{else}}inactive{{/if}}"></span>
-                Round Status: {{#if IsRunning}}In Progress{{else}}Not Started{{/if}}
-            </h2>
-        </div>
-
-        <div class="columns">
-            <div class="column">
-                <div class="notification is-info is-light">
-                    <p class="heading">{{#if IsRunning}}Current Round Started{{else}}Last Round Started{{/if}}</p>
-                    <p class="title is-5">{{LastStartStr}}</p>
+        <form id="group-form">
+            <div class="columns is-vcentered mb-4">
+                <div class="column is-6">
+                    <div class="field">
+                        <label class="label">Working Group</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="group_id"
+                                        class="select"
+                                        hx-get="/status"
+                                        hx-target="#status-container"
+                                        hx-trigger="change">
+                                    {{#each GroupOptions}}
+                                        <option value="{{ID}}" {{#if Selected}}selected{{/if}}>{{Name}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-6 has-text-right">
+                    <p class="heading">Selected Group</p>
+                    <p class="title is-4">{{State.GroupName}}</p>
                 </div>
             </div>
-            <div class="column">
-                <div class="notification is-warning is-light">
-                    <p class="heading">{{#if IsRunning}}Current Round Status{{else}}Last Round Ended{{/if}}</p>
-                    <p class="title is-5">{{LastStopStr}}</p>
+
+            <div class="mb-5">
+                <h2 class="title is-3">
+                    <span class="running-indicator {{#if State.IsRunning}}active{{else}}inactive{{/if}}"></span>
+                    Status: {{#if State.IsRunning}}In Progress{{else}}Not Started{{/if}}
+                </h2>
+            </div>
+
+            <div class="columns">
+                <div class="column">
+                    <div class="notification is-info is-light">
+                        <p class="heading">{{#if State.IsRunning}}Current Round Started{{else}}Last Round Started{{/if}}</p>
+                        <p class="title is-5">{{State.LastStartStr}}</p>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="notification is-warning is-light">
+                        <p class="heading">{{#if State.IsRunning}}Current Round Status{{else}}Last Round Ended{{/if}}</p>
+                        <p class="title is-5">{{State.LastStopStr}}</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="buttons is-centered mt-5">
-            <button class="button is-success is-large" 
-                    hx-post="/start" 
-                    hx-target="#status-container"
-                    hx-swap="innerHTML"
-                    {{#if IsRunning}}disabled{{/if}}
-                    title="{{#if IsRunning}}A round is already in progress{{else}}Start a new round{{/if}}">
-                <span class="icon">
-                    <i>▶</i>
-                </span>
-                <span>Start Round</span>
-            </button>
-            <button class="button is-danger is-large" 
-                    hx-post="/stop" 
-                    hx-target="#status-container"
-                    hx-swap="innerHTML"
-                    {{#unless IsRunning}}disabled{{/unless}}
-                    title="{{#if IsRunning}}End the current round{{else}}No round in progress{{/if}}">
-                <span class="icon">
-                    <i>■</i>
-                </span>
-                <span>End Round</span>
-            </button>
-        </div>
+            <div class="columns mt-2">
+                <div class="column">
+                    <div class="notification is-primary is-light has-text-centered">
+                        <p class="heading">Total Today ({{State.GroupName}})</p>
+                        <p class="title is-4">{{State.TotalTodayFormatted}}</p>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="notification is-primary is-light has-text-centered">
+                        <p class="heading">Total ({{State.GroupName}})</p>
+                        <p class="title is-4">{{State.TotalOverallFormatted}}</p>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="notification is-link is-light has-text-centered">
+                        <p class="heading">Total (All Working Groups)</p>
+                        <p class="title is-4">{{AllGroupsTotalFormatted}}</p>
+                    </div>
+                </div>
+            </div>
 
-        <div class="buttons is-centered mt-4">
-            <a href="/stats" class="button is-info is-light">
-                <span class="icon">
-                    <i>📊</i>
-                </span>
-                <span>View Statistics</span>
-            </a>
-            <a href="/export/csv" class="button is-link is-light">
-                <span class="icon">
-                    <i>📥</i>
-                </span>
-                <span>Export Rounds to CSV</span>
-            </a>
-        </div>
+            <div class="buttons is-centered mt-5">
+                <button class="button is-success is-large"
+                        hx-post="/start"
+                        hx-target="#status-container"
+                        hx-swap="innerHTML"
+                        hx-include="#group-form"
+                        {{#if State.IsRunning}}disabled{{/if}}
+                        title="{{#if State.IsRunning}}A round is already in progress{{else}}Start a new round{{/if}}">
+                    <span class="icon">
+                        <i>▶</i>
+                    </span>
+                    <span>Start Round</span>
+                </button>
+                <button class="button is-danger is-large"
+                        hx-post="/stop"
+                        hx-target="#status-container"
+                        hx-swap="innerHTML"
+                        hx-include="#group-form"
+                        {{#unless State.IsRunning}}disabled{{/unless}}
+                        title="{{#if State.IsRunning}}End the current round{{else}}No round in progress{{/if}}">
+                    <span class="icon">
+                        <i>■</i>
+                    </span>
+                    <span>End Round</span>
+                </button>
+            </div>
+
+            <div class="buttons is-centered mt-4">
+                <button class="button is-warning is-light"
+                        hx-post="/groups/reset"
+                        hx-target="#status-container"
+                        hx-swap="innerHTML"
+                        hx-include="#group-form"
+                        hx-confirm="Reset all rounds for this working group? This cannot be undone."
+                        {{#unless State.TotalOverallSeconds}}disabled{{/unless}}>
+                    <span class="icon">
+                        <i>♻</i>
+                    </span>
+                    <span>Reset Working Group</span>
+                </button>
+                <a href="/stats" class="button is-info is-light">
+                    <span class="icon">
+                        <i>📊</i>
+                    </span>
+                    <span>View Statistics</span>
+                </a>
+                <a href="/groups/manage" class="button is-dark">
+                    <span class="icon">
+                        <i>🛠</i>
+                    </span>
+                    <span>Manage Groups</span>
+                </a>
+                <a href="/export/csv?group_id={{SelectedGroupID}}" class="button is-link is-light">
+                    <span class="icon">
+                        <i>📥</i>
+                    </span>
+                    <span>Export Rounds to CSV</span>
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 

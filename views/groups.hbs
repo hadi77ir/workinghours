@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Working Groups</title>
+    <link rel="stylesheet" href="/static/bulma.min.css">
+    <style>
+        .hero {
+            background: linear-gradient(135deg, #485fc7 0%, #00d1b2 100%);
+        }
+        .groups-box {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <section class="hero is-medium">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <h1 class="title is-1">👥 Manage Working Groups</h1>
+                <p class="subtitle is-4">Create, rename, or remove working groups</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-10">
+                    <div class="groups-box">
+                        <div class="level mb-4">
+                            <div class="level-left">
+                                <div class="level-item">
+                                    <h2 class="title is-4">Existing Working Groups</h2>
+                                </div>
+                            </div>
+                            <div class="level-right">
+                                <div class="level-item">
+                                    <a href="/" class="button is-link is-light">
+                                        <span class="icon">🏠</span>
+                                        <span>Back to Tracker</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="table is-fullwidth is-striped is-hoverable">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th class="has-text-right">Total Time</th>
+                                        <th class="has-text-centered">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each Groups}}
+                                    <tr>
+                                        <td style="width: 45%;">
+                                            <form method="post" action="/groups/{{ID}}/update" class="field has-addons">
+                                                <div class="control is-expanded">
+                                                    <input class="input" type="text" name="name" value="{{Name}}" required>
+                                                </div>
+                                                <div class="control">
+                                                    <button type="submit" class="button is-primary">Save</button>
+                                                </div>
+                                            </form>
+                                        </td>
+                                        <td class="has-text-right" style="width: 20%;">
+                                            <span class="tag is-link is-light is-medium">{{TotalFormatted}}</span>
+                                        </td>
+                                        <td class="has-text-centered" style="width: 35%;">
+                                            <form method="post" action="/groups/{{ID}}/delete" style="display:inline-block;" onsubmit="return confirm('Delete this working group? Rounds must be reset first.');">
+                                                <button type="submit" class="button is-danger" {{#if HasRounds}}disabled{{/if}}>Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="notification is-warning is-light mt-4">
+                            <p class="has-text-weight-semibold">Notes:</p>
+                            <ul>
+                                <li>You cannot delete the last remaining working group.</li>
+                                <li>Groups with recorded rounds must be reset before deletion.</li>
+                                <li>Use the reset button on the home page to clear a group's rounds.</li>
+                            </ul>
+                        </div>
+
+                        <hr>
+
+                        <h3 class="title is-5">Add New Working Group</h3>
+                        <form method="post" action="/groups">
+                            <div class="field has-addons">
+                                <div class="control is-expanded">
+                                    <input class="input" type="text" name="name" placeholder="e.g. Design Team" required>
+                                </div>
+                                <div class="control">
+                                    <button type="submit" class="button is-success">Add Group</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <p>
+                <strong>Working Hours Tracker</strong> - Manage your working groups effortlessly
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
+

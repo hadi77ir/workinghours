@@ -7,6 +7,7 @@ A simple and elegant web application built with **Go Fiber v2**, **Handlebars**,
 - 🎯 **Round-Based Tracking**: Track work sessions as rounds with start and end times
 - 🚫 **Prevents Invalid States**: Cannot start multiple consecutive rounds or stop when nothing is running
 - 📊 **Real-time Status**: View the current round state (in progress or not started) with visual indicators
+- 🧩 **Working Groups**: Organize rounds by customizable working groups with per-group dashboards
 - 📈 **Daily Statistics**: View daily summaries with total hours in HH:mm:ss format
 - 🔄 **Auto-refresh**: Status automatically refreshes every 30 seconds using HTMX
 - 💾 **Persistent Storage**: All rounds stored in SQLite database using GORM
@@ -96,42 +97,47 @@ SERVER_ADDR=:80 ./workinghours
 
 ## 📖 Usage
 
-1. **Starting a Round**:
+1. **Choose a Working Group**:
+   - Use the selector at the top of the home page to pick a working group
+   - The dashboard instantly updates totals and status for the selected group
+   - Click **Manage Groups** to add, rename, or delete working groups
+
+2. **Starting a Round**:
    - Click the green **Start Round** button to begin tracking a work session
-   - A new round is created in the database with the current timestamp
-   - The status indicator will turn green and animate
-   - The Start button becomes disabled (prevents multiple consecutive starts)
-   - The Stop button becomes active
+   - A new round is created for the selected working group with the current timestamp
+   - The status indicator turns green and animates while running
 
-2. **Ending a Round**:
+3. **Ending a Round**:
    - Click the red **End Round** button to finish the current session
-   - The round is updated with the end timestamp
-   - Duration is automatically calculated
-   - The status indicator turns red
-   - The Stop button becomes disabled (prevents multiple consecutive stops)
-   - The Start button becomes active again
+   - The round is stamped with an end time and the duration is calculated automatically
+   - Buttons toggle states to prevent starting or stopping twice in a row
 
-3. **Viewing Status**:
-   - **Round Status**: Shows "In Progress" or "Not Started" with a color-coded indicator
-   - **Current/Last Round Started**: Shows when the current or last round started
-   - **Current Round Status/Last Round Ended**: Shows "In progress..." or the end timestamp
-   - The page automatically refreshes every 30 seconds
+4. **Viewing Totals**:
+   - Cards show **Total Today** and **Total (All Time)** for the selected working group
+   - **Total (All Working Groups)** aggregates every group, including active rounds
+   - Switch groups from the selector to compare totals instantly
 
-4. **Viewing Statistics**:
-   - Click the **View Statistics** button to see daily summaries
-   - Table shows each day with:
-     - Date in readable format
-     - Number of rounds completed
-     - Total time worked in HH:mm:ss format
-   - Days are sorted from most recent to oldest
-   - Perfect for tracking productivity patterns
+5. **Viewing Statistics**:
+   - Visit the **Daily Statistics** page to browse by working group and see daily breakdowns
+   - Review overall totals per group and export data for further analysis
 
-5. **Exporting Data**:
-   - Click the **Export Rounds to CSV** button to download all your tracking data
-   - The CSV file includes: Round ID, Start Time, End Time, Duration (minutes), Status
-   - Filename format: `hours-tracker-rounds-YYYY-MM-DD-HHMMSS.csv`
-   - Durations are automatically calculated for completed rounds
-   - Perfect for importing into Excel, Google Sheets, or other tools
+6. **Resetting a Working Group**:
+   - Use the **Reset Working Group** button to delete all rounds for the selected group
+   - A confirmation dialog prevents accidental resets (this action cannot be undone)
+
+7. **Exporting Data**:
+   - Click **Export Rounds to CSV** (home or stats page) to download only the currently selected working group
+   - The CSV includes Round ID, Working Group, Start/End times, duration in minutes, and status
+   - Filename format: `workinghours-<group>-YYYY-MM-DD-HHMMSS.csv`
+   - Perfect for importing into spreadsheets or reporting tools
+
+## 🧩 Working Groups
+
+- Visit `/groups/manage` to add, rename, or delete working groups
+- Each group displays its cumulative total time for quick comparisons
+- Groups with recorded rounds must be reset before they can be deleted
+- The last remaining working group cannot be removed to ensure valid tracking
+- Use the reset button on the home page to clear all rounds for a specific group
 
 ## 💾 Database
 
@@ -142,12 +148,20 @@ The application creates a `hours.db` SQLite database file in the project root di
 ### Database Schema
 
 ```go
+type WorkingGroup struct {
+    ID        uint      // Primary key
+    Name      string    // Unique name for the group
+    CreatedAt time.Time
+    UpdatedAt time.Time
+}
+
 type Round struct {
-    ID        uint       // Primary key
-    StartTime time.Time  // When the round started
-    EndTime   *time.Time // When the round ended (NULL = in progress)
-    CreatedAt time.Time  // Record creation timestamp
-    UpdatedAt time.Time  // Record update timestamp
+    ID             uint       // Primary key
+    StartTime      time.Time  // When the round started
+    EndTime        *time.Time // When the round ended (NULL = in progress)
+    WorkingGroupID uint       // Associated working group
+    CreatedAt      time.Time
+    UpdatedAt      time.Time
 }
 ```
 
@@ -168,7 +182,12 @@ The compiled `workinghours` binary can run standalone without any external files
    - `GET /stats` - Renders daily statistics page with totals
    - `POST /start` - Creates a new round (validates no unfinished round exists)
    - `POST /stop` - Ends the current round (validates an unfinished round exists)
-   - `GET /export/csv` - Exports all rounds with durations to CSV file
+   - `POST /groups/reset` - Clears all rounds for a working group (with confirmation)
+   - `GET /groups/manage` - Working group management UI (add/edit/remove)
+   - `POST /groups` - Creates a new working group
+   - `POST /groups/:id/update` - Renames an existing working group
+   - `POST /groups/:id/delete` - Deletes a working group with no recorded rounds
+   - `GET /export/csv` - Exports all rounds with durations and working group names to CSV
 
 ### Frontend (Handlebars + Bulma + HTMX)
 

@@ -62,7 +62,45 @@
                             </div>
                         </div>
 
-                        {{#if Summaries}}
+                        <form method="get" class="box has-background-light mb-5">
+                            <div class="field">
+                                <label class="label">Select Working Group</label>
+                                <div class="control">
+                                    <div class="select is-medium">
+                                        <select name="group_id" onchange="this.form.submit()">
+                                            {{#each GroupOptions}}
+                                                <option value="{{ID}}" {{#if Selected}}selected{{/if}}>{{Name}}</option>
+                                            {{/each}}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="columns is-multiline">
+                            <div class="column is-one-third">
+                                <div class="notification is-primary is-light has-text-centered">
+                                    <p class="heading">Total Today ({{SelectedGroupName}})</p>
+                                    <p class="title is-4">{{SelectedGroupTodayFormatted}}</p>
+                                </div>
+                            </div>
+                            <div class="column is-one-third">
+                                <div class="notification is-primary is-light has-text-centered">
+                                    <p class="heading">Total ({{SelectedGroupName}})</p>
+                                    <p class="title is-4">{{SelectedGroupTotalFormatted}}</p>
+                                </div>
+                            </div>
+                            <div class="column is-one-third">
+                                <div class="notification is-link is-light has-text-centered">
+                                    <p class="heading">Total (All Working Groups)</p>
+                                    <p class="title is-4">{{AllGroupsTotalFormatted}}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="title is-5 mt-5">Daily Summary ({{SelectedGroupName}})</h3>
+
+                        {{#if DailySummaries}}
                         <div class="table-container">
                             <table class="table is-fullwidth is-striped is-hoverable">
                                 <thead>
@@ -73,18 +111,18 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{#each Summaries}}
+                                    {{#each DailySummaries}}
                                     <tr>
                                         <td>
-                                            <strong>{{this.DateDisplay}}</strong>
+                                            <strong>{{DateDisplay}}</strong>
                                             <br>
-                                            <small class="has-text-grey">{{this.Date}}</small>
+                                            <small class="has-text-grey">{{Date}}</small>
                                         </td>
                                         <td class="has-text-centered">
-                                            <span class="tag is-info is-light">{{this.RoundCount}} round{{#unless (eq this.RoundCount 1)}}s{{/unless}}</span>
+                                            <span class="tag is-info is-light">{{RoundCount}} round(s)</span>
                                         </td>
                                         <td class="has-text-right">
-                                            <span class="total-time">{{this.TotalFormatted}}</span>
+                                            <span class="total-time">{{TotalFormatted}}</span>
                                         </td>
                                     </tr>
                                     {{/each}}
@@ -98,13 +136,33 @@
                                     <span style="font-size: 3rem;">📭</span>
                                 </span>
                             </p>
-                            <p class="has-text-centered title is-5">No completed rounds yet</p>
+                            <p class="has-text-centered title is-5">No completed rounds yet for this working group</p>
                             <p class="has-text-centered">Start tracking your work to see statistics here!</p>
                         </div>
                         {{/if}}
 
+                        <h3 class="title is-5 mt-6">Totals by Working Group</h3>
+                        <div class="table-container">
+                            <table class="table is-fullwidth is-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Working Group</th>
+                                        <th class="has-text-right">Total Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each GroupTotals}}
+                                    <tr>
+                                        <td>{{GroupName}}</td>
+                                        <td class="has-text-right">{{TotalFormatted}}</td>
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </div>
+
                         <div class="has-text-centered mt-5">
-                            <a href="/export/csv" class="button is-success is-light">
+                            <a href="/export/csv?group_id={{SelectedGroupID}}" class="button is-success is-light">
                                 <span class="icon">
                                     <span>📥</span>
                                 </span>
